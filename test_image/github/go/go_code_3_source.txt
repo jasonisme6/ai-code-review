@@ -1,0 +1,41 @@
+    defer serverWait.Wait() // Order-of-operations: 3
+    // Bind the listener, and put the close on the defer stack
+    // The close must pop off the defer stack before the wait!
+    port, _ := utils.GetFreePort()
+    ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+    if err != nil {
+        t.Fatal(err)
+    }
+    defer ln.Close() // Order-of-operations: 1
+    go func() {
+        // Signal the waitgroup to finish when the HTTP server closes
+        defer serverWait.Done() // Order-of-operations: 2
+        t.Logf("API starting: port %d (%s)", port, ln.Addr())
+        t.Logf("API terminating: %v", http.Serve(ln, mux))
+    }()
+    pact := dsl.Pact{
+        Port: 6666,
+    }
+    if err := pact.VerifyProvider(types.VerifyRequest{
+        ProviderBaseURL: fmt.Sprintf("http://localhost:%d", port),
+        PactURLs: pactFiles,
+        ProviderStatesURL: fmt.Sprintf("http://localhost:%d/states", port)
+        ProviderStatesSetupURL: fmt.Sprintf("http://localhost:%d/setup", port),
+    }); err != nil {
+        t.Errorf("verification failed: %v", err)
+    }
+}
+func getPactFiles(t *testing.T) (res []string) {
+    filepath.Walk(".", func(path string, fi os.FileInfo, err error) error {
+        if fi.IsDir() {
+            return nil
+        }
+        if strings.Contains(path, "pact") && filepath.Ext(path) == ".json" {
+            t.Logf("verifying Pact %s", path)
+            abspath, _ := filepath.Abs(path)
+            res = append(res, abspath)
+        }
+        return nil
+    })
+    return res
+}

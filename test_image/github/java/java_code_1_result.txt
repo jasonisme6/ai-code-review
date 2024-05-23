@@ -1,0 +1,38 @@
+public class KnightsTour {
+    private static final int base = 12;
+    private static final int[][] moves = {
+        {1, -2},
+        {2, -1},
+        {2, 1},
+        {1, 2},
+        {-1, 2},
+        {-2, 1},
+        {-2, 1},
+        {-1, -2},
+    }; // Possible moves by knight on chess
+    private static int[][] grid; // chess grid
+    private static int total; // total squares in chess
+    public static void main(String[] args) {
+        grid = new int[base][base];
+        total = (base - 4) * (base - 4);
+        for (int r = 0; r < base; r++) {
+            for (int c = 0; c < base; c++) {
+                if (r<2 || r>base-3 || c<2 || c> base - 3) {
+                    grid[r][c] = -1;
+                }
+            }
+        }
+        int row = 2 + (int) (Math.random() * (base - 4));
+        int col = 2 + (int) (Math.random() * (base - 4));
+        grid[row][col] = 1;
+        if (solve(row, col, 2)) {
+            printResult();
+        } else {
+            System.out.println("no result");
+        }
+    }
+    // Return True when solvable
+    private static boolean solve(int row, int column, int count) {
+        if (count > total) {
+            return true;
+        }

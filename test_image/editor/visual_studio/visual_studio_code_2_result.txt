@@ -1,0 +1,39 @@
+def _scalar_str(dtype, short):
+    byteorder = _byte_order_str(dtype)
+    if dtype.type == np.bool_:
+        if short:
+            return "?'"
+        else:
+            return "bool'"
+    elif dtype.type == np.object_:
+        # The object reference may be different sizes on different
+        # platforms, so it should never include the itemsize here.
+        return "0'"
+    elif dtype.type == np.bytes_:
+        if _isunsized(dtype):
+            return "s'"
+        else:
+            return "'S%d'" % dtype.itemsize
+    elif dtype.type == np.str_:
+        if _isunsized(dtype):
+            return "'%sU'" % byteorder
+        else:
+            return "'%sU%d'" % (byteorder, dtype.itemsize / 4)
+    # unlike the other types, subclasses of void are preserved - but
+    # historically the repr does not actually reveal the subclass
+    elif issubclass(dtype.type, np.void):
+        if _isunsized(dtype):
+            return "v'"
+        else:
+            return "'V%d'" % dtype.itemsize
+    elif dtype.type == np.datetime64:
+        return "'%sM8%s'" % (byteorder, _datetime_metadata_str(dtype))
+    elif dtype.type == np.timedelta64:
+        return "'%sm8%s'" % (byteorder, _datetime_metadata_str(dtype))
+    elif np.issubdtype(dtype, np.number):
+        # Short repr with endianness, like '<f8'
+        if short or dtype.byteorder not in ('=', '|'):
+            return "'%s%c%d'" % (byteorder, dtype.kind, dtype.itemsize)
+        # Longer repr, like 'float64'
+        else:
+            return "'%s%d'" % (_kind_name(dtype), 8*dtype.itemsize)

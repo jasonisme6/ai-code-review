@@ -1,0 +1,50 @@
+@_display_as_base
+class _UFuncOutputCastingError(_UFuncCastingError):
+    """ Thrown when a ufunc output cannot be casted """
+    def __init__(self, ufunc, casting, from_, to, i):
+        super().__init__(ufunc, casting, from_, to)
+        self.out_i = i
+
+    def __str__(self):
+        # only show the number if more than one output exists
+        i_str = "{} ".format(self.out_i) if self.ufunc.nout != 1 else ""
+        return (
+            "Cannot cast ufunc {!r} output {}from {!r} to {!r} with casting "
+            "rule {!r}"
+        ).format(
+            self.ufunc.__name__, i_str, self.from_, self.to, self.casting
+        )
+
+
+@_display_as_base
+class _ArrayMemoryError(MemoryError):
+    """ Thrown when an array cannot be allocated"""
+    def __init__(self, shape, dtype):
+        self.shape = shape
+        self.dtype = dtype
+
+    @property
+    def _total_size(self):
+        num_bytes = self.dtype.itemsize
+        for dim in self.shape:
+            num_bytes *= dim
+        return num_bytes
+
+    @staticmethod
+    def _size_to_string(num_bytes):
+        """ Convert a number of bytes into a binary size string """
+
+        # https://en.wikipedia.org/wiki/Binary_prefix
+        LOG2_STEP = 10
+        STEP = 1024
+        units = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
+
+        unit_i = max(num_bytes.bit_length() - 1, 1) // LOG2_STEP
+        unit_val = 1 << (unit_i * LOG2_STEP)
+        n_units = num_bytes / unit_val
+        del unit_val
+
+        # ensure we pick a unit that is correct after rounding
+        if round(n_units) == STEP:
+            unit_i += 1
+            n_units /= STEP

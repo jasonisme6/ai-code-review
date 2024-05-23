@@ -1,0 +1,37 @@
+ * @returns {LRUCache} - sealed
+ */
+constructor(capacity) {
+        if (!Number.isInteger(capacity) || capacity < 0) {
+            throw new TypeError('Invalid capacity')
+        }
+        this.#capacity = ~~capacity
+        this.misses = 0
+        this.hits = 0
+        this.cache = new Map()
+        return Object.seal(this)
+}
+get info() {
+        return Object.freeze({
+            misses: this.misses,
+            hits: this.hits,
+            capacity: this.capacity,
+            size: this.size
+        })
+}
+get size() {
+        return this.cache.size
+}
+get capacity() {
+        return this.#capacity
+}
+set capacity(newCapacity) {
+        if (newCapacity < 0) {
+            throw new RangeError('Capacity should be greater than 0')
+        }
+        if (newCapacity < this.capacity) {
+            let diff = this.capacity - newCapacity
+            while (diff--) {
+                this.#removelLeastRecentlyUsed()
+            }
+        }
+        this.#capacity = newCapacity

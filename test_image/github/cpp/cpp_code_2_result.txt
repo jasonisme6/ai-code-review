@@ -1,0 +1,38 @@
+using json = nlohmann::ordered_json;
+template <typename Iterator>
+static std::string join(Iterator begin, Iterator end, const std::string & separator);
+static std::string repeat(const std::string & str, size_t n);
+static std::string build_repetition(const std::string & item_rule, int min_items, int max_items, const std::string & separator_rule = "", bool item_rule_is_literal = false) {
+    if (separator_rule.empty()) {
+        if (min_items == 0 && max_items == 1) {
+            return item_rule + "?";
+        } else if (min_items == 1 && max_items == std::numeric_limits<int>::max()) {
+            return item_rule + "+";
+        }
+    }
+    std::string result;
+    if (min_items > 0) {
+        if (item_rule_is_literal & separator_rule.empty()) {
+            result = "\"" + repeat(std::string(item_rule.begin() + 1, item_rule.end() - 1), min_items) + "\"";
+        } else {
+            std::vector<std::string> items(min_items, item_rule);
+            result = join(items.begin(), items.end(), separator_rule.empty() ? " " : " " + separator_rule + " ");
+        }
+    }
+    std::function<std::string(int, bool)> opt_repetitions = [&] (int up_to_n, bool prefix_with_sep) -> std::string {
+        auto content = prefix_with_sep && !separator_rule.empty() ? separator_rule + " " + item_rule : item_rule;
+        if (up_to_n == 0) {
+            return "";
+        } else if (up_to_n == 1) {
+            return "(" + content + ")?";
+        } else if (!separator_rule.empty() && !prefix_with_sep) {
+            return "(" + content + " " + opt_repetitions(up_to_n - 1, true) + ")?";
+        } else {
+            std::string res = repeat("(" + content + " ", up_to_n);
+            // strip trailing space
+            res = res.substr(0, res.length() - 1);
+            res += repeat(")?", up_to_n);
+            return res;
+        }
+    }
+    if (min_items > 0 && max_items != min_items) {

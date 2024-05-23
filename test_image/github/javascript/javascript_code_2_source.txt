@@ -1,0 +1,44 @@
+class Month {
+    constructor () {
+        this.Days = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
+        this.BDays = ['M', 'Su', 'S', 'F', 'Th', 'W', 'T']
+        this.epoch = { month: 1, year: 1900 }
+        this.monthDays = [31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        this.monthDaysLeap = [31, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    }
+    printCal(das, startDay, output = (value) => console.log(value)) {
+        output('M T W Th F S Su')
+        const dates = []
+        let i
+        for (i = 1; i <= days; i++) {
+            dates.push(i)
+        }
+        for (i = 0; i < this.Days.indexOf(startDay); i++) {
+            dates.unshift(' ')
+        }
+        while (true) {
+            let row = ''
+            for (i = 0; i < 7 && dates.length !== 0; i++) {
+                row += dates.shift()
+                while (row.length % 4 !== 0) {
+                    row += ' '
+                }
+            }
+            output(row)
+            if (dates.length === 0) break
+        }
+    }
+    parseDate(date) {
+        const dateAr = []
+        let block = ''
+        let i
+        for (i = 0; i < date.length; i++) {
+            if (date[i] === '/') {
+                dateAr.push(parseInt(block))
+                block = ''
+                continue
+            }
+            block += date[i]
+        }
+        dateAr.push(parseInt(block))
+        if (dateAr.length !== 2) throw new Error('Improper string encoding')

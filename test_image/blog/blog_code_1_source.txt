@@ -1,0 +1,14 @@
+if (j instanceof JsonObject(var pairs)
+    && pairs.get("name") instanceof JsonString(String name)
+    && pairs.get("age") instanceof JsonNumber(double age)
+    && pairs.get("city") instanceof JsonString(String city)) {
+    // use name, age, city
+}
+sealed interface JsonValue {
+    record JsonString(String s) implements JsonValue { }
+    record JsonNumber(double d) implements JsonValue { }
+    record JsonNull() implements JsonValue { }
+    record JsonBoolean(boolean b) implements JsonValue { }
+    record JsonArray(List<JsonValue> values) implements JsonValue { }
+    record JsonObject(Map<String, JsonValue> pairs) implements JsonValue {
+}

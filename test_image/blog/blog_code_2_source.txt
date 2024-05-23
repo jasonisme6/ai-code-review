@@ -1,0 +1,21 @@
+# This is bad
+names = ["Nick", "Mike", "John"]
+# This is good
+score_list = [12, 33, 14, 24]
+word_dict = {
+    'a': 'apple',
+    'b': 'banana',
+    'c': 'cherry',
+}
+# This is bad
+class Person:
+    def __init__(self, person_first_name, person_last_name, person_age):
+        self.person_first_name = person_first_name
+        self.person_last_name = person_last_name
+        self.person_age = person_age
+# This is good
+class Person:
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age

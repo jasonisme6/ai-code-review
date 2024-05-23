@@ -1,0 +1,26 @@
+def add_result_to_image_filename(url):
+    # Find the index of the last slash
+    last_slash_index = url.rfind('/')
+
+    # Find the index where the filename starts
+    filename_start_index = last_slash_index + 1
+
+    # Find the index where the filename ends
+    filename_end_index = url.rfind('.')
+
+    # Extract the filename and file extension
+    filename = url[filename_start_index:filename_end_index]
+    extension = url[filename_end_index:]
+
+    # Build the new filename by adding "_result" and then adding back the extension
+    new_image_filename = filename + "_result" + extension
+    new_text_filename = filename + "_result" + ".txt"
+    # Replace the filename in the original URL with the new filename
+    new_image_url = url[:filename_start_index] + new_image_filename
+    new_txt_url = url[:filename_start_index] + new_text_filename
+    return new_image_url, new_txt_url
+
+
+def clean_line(line):
+    # Remove all spaces and strip the line.
+    return line.replace(" ", "").strip()

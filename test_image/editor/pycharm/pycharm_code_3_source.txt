@@ -1,0 +1,28 @@
+original_show_image = None
+show_image = None
+gpt_image = None
+already_detected = True
+code_list = []
+code_region_list = []
+text_window = None
+
+def draw_code_and_review(code_list, gpt_answer):
+    global gpt_image
+    # Set the initial position for text
+    x = 10
+    y = 30
+    line_height = 40
+    for i, code_snippet in enumerate(code_list):
+        cv2.putText(gpt_image, f"### Code Block {i + 1}:", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+        y += line_height
+        lines = code_snippet.splitlines()
+        for line in lines:
+            cv2.putText(gpt_image, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2)
+            y += line_height
+        # Draw each line of text on the image
+    for line in gpt_answer.splitlines():
+        if '. ' in line:
+            sentences = line.split('. ')
+            for sentence in sentences:
+                if sentence.strip().isdigit():
+                    continue

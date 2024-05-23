@@ -1,0 +1,62 @@
+func buildStaticSite() error {
+    
+    if err := dropCreateDir(outDir); err != nil {
+        return fmt.Errorf("drop-create out dir: %w", err)
+    
+    }
+    
+    if err := renderIndex(readmePath, outIndexFile); err != nil {
+        return fmt.Errorf("convert markdown to html: %w", err)
+    
+    }
+    
+    input, err := os.ReadFile(outIndexFile)
+    
+    if err != nil {
+        return fmt.Errorf("read converted html: %w", err)
+    
+    }
+    
+    doc, err := goquery.NewDocumentFromReader(bytes.NewReader(input))
+    
+    if err != nil {
+        return fmt.Errorf("create goquery instance: %w", err)
+    
+    }
+    
+    categories, err := extractCategories(doc)
+    
+    if err != nil {
+        return fmt.Errorf("extract categories: %w", err)
+    
+    }
+    
+    if err := renderCategories(categories); err != nil {
+        return fmt.Errorf("render categories: %w", err)
+    
+    }
+    
+    if err := rewriteLinksInIndex(doc, categories); err != nil {
+        return fmt.Errorf("rewrite links in index: %w", err)
+    
+    }
+    
+    if err := renderSitemap(categories); err != nil {
+        return fmt.Errorf("render sitemap: %w", err)
+    
+    }
+    
+    for _, srcFilename := range staticFiles {
+        dstFilename := filepath.Join(outDir, filepath.Base(srcFilename))
+        fmt.Printf("Copy static file: %s -> %s\n", srcFilename, dstFilename)
+        if err := cp.Copy(srcFilename, dstFilename); err != nil {
+            
+            return fmt.Errorf("copy static file '%s' to '%s': %w", srcFilename, dstFilename, err)
+        
+        }
+    
+    }
+    
+    return nil
+
+}

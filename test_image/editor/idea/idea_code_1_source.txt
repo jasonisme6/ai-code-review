@@ -1,0 +1,24 @@
+public static final int HIGH_HOPS_REWARD = 15;
+public static final int MEDIUM_HOPS_REWARD = 10;
+public static final int LOW_HOPS_REWARD = 5;
+private static final Logger LOGGER = LoggerFactory.getLogger(ChallengeGeneratorService.class);
+private static final int[] DEFAULT_HOPS_DISTRIBUTION = new int[]{
+        HIGH_HOPS_REWARD, HIGH_HOPS_REWARD,
+        MEDIUM_HOPS_REWARD, MEDIUM_HOPS_REWARD, MEDIUM_HOPS_REWARD,
+        LOW_HOPS_REWARD, LOW_HOPS_REWARD
+};
+private final ChallengeRepository challengeRepository;
+private final QuantifiableChallengeFactoryRepository quantifiableChallengeFactoryRepository;
+private final GeneralChallengeTemplateRepository generalChallengeTemplateRepository;
+private final Random random;
+public ChallengeGeneratorService(
+        ChallengeRepository challengeRepository,
+        QuantifiableChallengeFactoryRepository quantifiableChallengeFactoryRepository,
+        GeneralChallengeTemplateRepository generalChallengeTemplateRepository,
+        @value("#{new java.util.Random()}") Random random
+) {
+    this.challengeRepository = challengeRepository;
+    this.quantifiableChallengeFactoryRepository = quantifiableChallengeFactoryRepository;
+    this.generalChallengeTemplateRepository = generalChallengeTemplateRepository;
+    this.random = random;
+}

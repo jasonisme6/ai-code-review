@@ -1,0 +1,40 @@
+import com.skydoves.whatif.whatIfNotNullOrEmpty
+object RecyclerViewBinding {
+    @JvmStatic
+    @BindingAdapter("adapter")
+    fun bindAdapter(view: RecyclerView, baseAdapter: BaseAdapter) {
+        view.adapter = baseAdapter
+    }
+    @JvmStatic
+    @BindingAdapter("adapterMovieList")
+    fun bindAdapterMovieList(view: RecyclerView, movies: List<Movie>?) {
+        movies.whatIfNotNull {
+           (view.adapter as? MovieListAdapter)?.addMovieList(it)
+        }
+    }
+    @JvmStatic
+    @BindingAdapter("paginationMovieList")
+    fun paginationMovieList(view: RecyclerView, viewModel: MainActivityViewModel) {
+        RecyclerViewPaginator(
+            recyclerView = view,
+            isLoading = { viewModel.isMovieListLoading },
+            loadMore = { viewModel.postMoviePage(it) },
+            onLast = { false }
+       ).run {
+            threshold = 4
+            currentPage = 1
+        }
+    }
+    @JvmStatic
+    @BindingAdapter("adapterPersonList")
+    fun bindAdapterPersonList(view: RecyclerView, people: List<Person>?) {
+        people.whatIfNotNull { items ->
+            view.adapter.whatIfNotNullAs<PeopleAdapter> {
+                it.addPeople(items)
+            }
+        }
+    }
+    @JvmStatic
+    @BindingAdapter("paginationPersonList")
+    fun paginationPersonList(view: RecyclerView, viewModel: MainActivityViewModel) {
+        RecyclerViewPaginator(
