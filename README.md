@@ -1,6 +1,4 @@
-# COSC428 Project
 Name: Utilizing Computer Vision for AI Real-Time Code Review on Computer Screen \
-Author: Minghao Li \
 Modified: 04/05/2024
 
 ## Description:
