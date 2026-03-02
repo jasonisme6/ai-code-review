@@ -27,4 +27,4 @@ Code for starting the application is under the run_application folder.
 image_code_ocr is for image code ocr only, no code review function in it. \
 screen_code_review is for only Mac live screen capture and code review. If you want to enable 
 GPT, you need to use your own API_KEY and change the key in gpt_review_code.
-you can also check the cv_demo.mp4 and cv_presentation.pptx for more information.
+
